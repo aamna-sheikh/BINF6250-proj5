@@ -1,8 +1,79 @@
 ## A description of the project
+## Description
 
+In this project, we built a genome assembler using a **de Bruijn graph**.
+A sequencing machine reads a genome in millions of short pieces called **reads**, in random order. Assembly means putting those pieces back together to rebuild the original DNA.
+
+Our program does this in four steps:
+1. **Read the data:** load the DNA reads from a FASTQ file.
+2. **Build the graph:** cut every read into small overlapping pieces of length k (called k-mers). Each k-mer is split into a left half and a right half, and we draw an arrow from the left half to the right half. Reads that overlap share the same pieces, so they connect automatically.
+3. **Walk the graph:** follow the arrows, using each arrow exactly once (an Eulerian walk).
+4. **Rebuild the DNA:** turn each walk back into a DNA sequence, called a **contig**.
+
+We first tested the program on small examples, then ran it on 2.4 million perfect 150 bp reads from the yeast (*S. cerevisiae*) genome, using k = 31. The program writes the contigs to a FASTA file and saves a statistics report (number of contigs, total length, N50, and more).
+We assumed perfect sequencing, which means no errors and no variants in the reads.
 
 ## Pertinent documentation and usage write-up
+### Requirements
+- Python 3
+- Jupyter Notebook (or an editor that runs notebook cells, like VS Code or PyCharm)
+- No extra packages are needed. The code only uses Python's built-in modules: `gzip`, `collections`, `random`, `time`, and `datetime`.
 
+### Files
+- `project04_yeast.ipynb`: the notebook with all the code
+- `data/sacCer_R64_150SE_30x_wgsim.fq.gz`: the yeast reads (from `project04.zip`)
+
+### How to run
+1. Unzip `project04.zip` into the project folder, so the reads are in the `data/` folder.
+2. Open the notebook.
+3. Run the cells **in order, from top to bottom**:
+   - the `read_fastq` cell
+   - the `DeBruijnGraph` class cell
+   - the toy example cell (a quick check that should give 1 contig)
+   - the real data (yeast) driver cell
+
+### Settings
+These are at the top of the driver cell:
+Setting- Value we used (Meaning)
+`INPUT_FILE`- `data/sacCer_R64_150SE_30x_wgsim.fq.gz` (the reads file)
+`K_MER_SIZE`- `31` (the length of each k-mer)
+`GENOME_SIZE`- `12,071,326` (the size of the yeast genome, used to compare results)
+`OUTPUT_FASTA`- `genome_assembly.fasta` (where the contigs are saved)
+`STATS_FILE`- `genome_assembly_stats.txt` (where the statistics are saved)
+
+### Output
+- `genome_assembly.fasta`: every contig, each with a header line like `>contig_1 length=22639116`
+- `genome_assembly_stats.txt`: a report with the number of contigs, total length, N50, longest contig, and timing
+
+### Run time
+On our computer, the yeast run took about 5 minutes:
+- loading reads: about 2 seconds
+- building the graph: about 3 minutes
+- walking the graph: about 2 minutes
+
+It also uses a lot of memory, because the graph has about 23 million nodes.
+
+### What each method does
+
+Method -What it does 
+
+`read_fastq` -reads the FASTQ file and keeps only the DNA lines |
+`add_edge` -adds an arrow between two nodes (only once, no duplicates) |
+`remove_edge` -removes an arrow |
+`build_graph_from_reads` -cuts every read into k-mers and adds an arrow for each one |
+`eulerian_walk` -walks the graph using each arrow once, using a loop and a stack |
+`assemble_contigs` -finds starting points, walks from each one, and turns each walk into a contig |
+`tour_to_sequence` -turns a list of nodes back into a DNA string |
+`get_assembly_stats` -calculates the number of contigs, lengths, mean, and N50 |
+`write_fasta` -saves the contigs to a FASTA file |
+
+### Small example
+```python
+reads = ["ATGGC", "GGCGT"]
+dbg = DeBruijnGraph(reads, k=4)
+contigs = dbg.assemble_contigs(seed=42)
+print(contigs)   # ['ATGGCGT']
+```
 
 ## Pseudocode
 
