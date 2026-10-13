@@ -33,7 +33,7 @@ We assumed perfect sequencing, which means no errors and no variants in the read
    - the real data (yeast) driver cell
 
 ### Settings
-These are at the top of the driver cell:
+These are at the top of the driver cell in the notenook:
 Setting- Value we used (Meaning)
 `INPUT_FILE`- `data/sacCer_R64_150SE_30x_wgsim.fq.gz` (the reads file)
 `K_MER_SIZE`- `31` (the length of each k-mer)
