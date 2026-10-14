@@ -197,31 +197,34 @@ write_fasta(contigs, file):
 
 ## Reflection narrative that describes what went right, what went wrong, what didn't you understand, how it could have been better, and how you could have been better.
 ### What went right
-Testing every function on small, hand-checkable examples before running the yeast data caught most of our bugs early, when they were easy to understand. The toy example (9 reads that should give one 26 bp contig) became our 1st check: if it didn't give exactly that contig, something was wrong.\
+Testing every function on small, hand-checkable examples before running the yeast data caught most of our bugs early, when they were easy to understand. The toy example (9 reads that should give one 26 bp contig) became our 1st check: if it didn't give exactly that contig, something was wrong.
 Comparing our three notebooks was also useful. Because we each got different results from the same data, we had the opportunity to dig and work out why, which is helpful. 
 
 ### What went wrong
-**Duplicate edges.** The yeast data has about 30× coverage, so most k-mers appear about 30 times. Without a duplicate check, the graph would hold about 30 copies of most edges, and the walk would drive over the same stretches again and again. On the toy example, this gave a 50 bp nonsense contig instead of the correct 26 bp one.\
+**Duplicate edges.** The yeast data has about 30× coverage, so most k-mers appear about 30 times. Without a duplicate check, the graph would hold about 30 copies of most edges, and the walk would drive over the same stretches again and again. On the toy example, this gave a 50 bp nonsense contig instead of the correct 26 bp one.
 
-**The recursion limit.** The recursive walk worked on the small examples but crashed on the yeast data with `RecursionError`, because Python only allows about 1,000 nested calls by default. We fixed this in different ways: \
-- One of us rewrote the walk as a loop with a stack (a list we add to and take from),\
-- Another kept the recursion but raised the limit to 25mil,\
+**The recursion limit.** The recursive walk worked on the small examples but crashed on the yeast data with `RecursionError`, because Python only allows about 1,000 nested calls by default. We fixed this in different ways: 
+- One of us rewrote the walk as a loop with a stack (a list we add to and take from),
+- Another kept the recursion but raised the limit to 25mil,
 - The third also kept the recursion, but set the limit from the number of edges in the graph. Each recursive call uses one edge, so the walk can never need more calls than there are edges. This version also puts the old limit back afterward. We chose this approach for our final notebook, and added try/finally so the limit is restored even if the walk crashes. It would fit any data set, from the toy example to the full yeast genome, without guessing a number, and it doesn’t leave Python’s setting changed after the program finishes.
 
 **Memory.** The graph for the yeast data has about 23 million nodes and 23 million edges, and building it takes several gigabytes of memory. Walking a copy of the graph would need memory for a second full copy, so by default assemble_contigs walks the original graph directly. This uses less memory, but it empties self.graph as the edges are used. This was pointed out during peer review: graph = self.graph doesn’t make a copy, so the original graph is changed. To make the trade-off explicit, assemble_contigs takes a copy_graph option. With copy_graph=True, it walks a copy and leaves self.graph unchanged. The final run peaked at 4.74 GB of memory on a 16 GB laptop.
 
-**Different results from the same data.** Our runs gave very different results:\
-- 30 contigs with a longest contig of 22.6 million bp\
-- 7,632 contigs with a longest contig of 233,925 bp (Note: this is the version before our finalized version where we ended up removing reverse-complement duplicates.)\
-At first we didn't know why, or which was right. We found that our graphs were identical, because the total lengths differ by exactly 30 letters per extra contig, and that the difference came down to one word in the walk: `if` vs `while`.\
-With `while`, after reaching a dead end, the walk goes back to an earlier fork, takes the other branch, and adds it to the same path, even though the two branches are not connected.\
+**Different results from the same data.** Our runs gave very different results:
+- 30 contigs with a longest contig of 22.6 million bp
+- 7,632 contigs with a longest contig of 233,925 bp (Note: this is the version before our finalized version where we ended up removing reverse-complement duplicates.)
+At first we didn't know why, or which was right. We found that our graphs were identical, because the total lengths differ by exactly 30 letters per extra contig, and that the difference came down to one word in the walk: `if` vs `while`.
+With `while`, after reaching a dead end, the walk goes back to an earlier fork, takes the other branch, and adds it to the same path, even though the two branches are not connected.
 With `if`, each walk is one straight path, and the other branch becomes its own contig. The 22.6 million bp contig is longer than the whole genome, which showed us that a Eulerian walk that uses every edge is not necessarily a realistic genome.
 
-**The genome was assembled twice.** Our total assembly length was 192.1% of the genome size. We checked our data and found the reads come from both DNA strands about equally, so most regions were assembled twice: once as a contig and once as its reverse complement.\
+**The genome was assembled twice.** Our total assembly length was 192.1% of the genome size. We checked our data and found the reads come from both DNA strands about equally, so most regions were assembled twice: once as a contig and once as its reverse complement.
 We added defremove_reverse_complement_duplicates(self, contigs, cutoff=0.9):going through the contigs longest first and dropping any contig where at least 90% of its k-mers are reverse complements of k-mers already kept. That brought the total down to 106.9% of the genome (2,967 contigs, N50 36,194 bp). The 90% cutoff is a judgment call. About 6.9% extra remains, which may come from shorter twins that differ by more than the cutoff allows, but we did not confirm this.
 
 ### Things I still don't understand
 How real assemblers decide where to stop a contig at a fork, and how they handle reverse-strand duplicates while building the graph, instead of afterward like we did.
 
-## Appendix (AI usage, citations, etc.)
+### Workflow
+With busy schedules over the week, we struggled to find times when we were all available to meet. As a result, each of us individually thought of how to approach the problem and came together to compare our solutions. Our final submitted notebook is a combination of all the techniques we thought worked best from each individual approach. We discussed as a group where approaches differed and which sections to take from each, making sure that we were all on board with every decision. Although we weren't able to meet regularly throughout the week, we were able to make our collaboration style work for this project.
 
+## Appendix (AI usage, citations, etc.)
+We used Claude to help diagnose the Python recursion limit we ran into when running our notebooks against the real dataset for the first time. We prompted, "How can we increase the Python recursion limit? Will there be any unexpected consequences of this?" We used feedback from this prompt to increase the recursion limit to a suitable amount.
