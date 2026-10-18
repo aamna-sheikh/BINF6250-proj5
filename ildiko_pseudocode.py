@@ -179,6 +179,7 @@ def smith_waterman(seq1, seq2, match=1, mismatch=-1, gap=-1): #Step 1: Set up gr
             #traceback_matrix at (i, j) = move
 
     #best_score = highest number in score matrix
+    #if best_score is 0 (END) display that and makes sure it doesn't get caught up in loop
     #max_pos = (row, column) where best_score is (if there is a tie, this keeps only the first one found)
 
     #print best_score
