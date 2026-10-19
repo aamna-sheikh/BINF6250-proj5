@@ -136,6 +136,8 @@ The printed matrix contains two cells with the best score of 10: one at row 10 /
 
 # Personal Reflections
 ## Group leader
+This was an interesting activity. At first, the pseudocode was hard to follow, and I struggled to turn it into code. What helped most was filling in the scoring matrix by hand for two short sequences, one cell at a time. Once I had done that manually, the pseudocode made sense, and each line of code matched a step I had already done myself. Tracing back through the table by hand also made the traceback function much easier to write. Meeting up with my team to discuss and work through the pseudocode together also helped a lot. Talking through each step made the algorithm clearer, and I’d use both approaches again for future problems.
+
 
 ## Other member
 
