@@ -58,8 +58,8 @@ Return aligned_seq1, aligned_seq2
 ```
 rows = length of seq1 + 1
 cols = length of seq2 + 1
-score_matrix = grid of zeros, size rows x cols (holds decimals)
-traceback_matrix = grid of zeros, size rows x cols (whole numbers 0, 1, 2, 3)
+score_matrix = grid of zeros, size rows x cols (whole numbers, dtype=int to avoid decimals)
+traceback_matrix = grid of zeros, size rows x cols (whole numbers 0, 1, 2, 3, dtype=int to avoid decimals)
 
 FOR i from 1 to rows - 1:
     FOR j from 1 to cols - 1:
