@@ -129,13 +129,22 @@ GGGGAAAAAA
 The printed matrix contains two cells with the best score of 10: one at row 10 / column 10, which traces back to `GGGGAAAAAA`, and one in the bottom-right corner, which would trace back to `AAAAAACCCC`.
 
 # Successes
+* All three functions (cal_score, traceback and smith_waterman) work together, and our output matches the expected output for the slide example (AC-TTA / ACATTA).
+* Filling in the scoring matrix and tracing back by hand first made the pseudocode much easier to understand and turn into code.
+* Meeting as a team to discuss and work through the pseudocode helped us understand each step.
+* The scoring values (match, mismatch and gap) can be changed when calling the function, so the algorithm can be tested with different scoring strategies.
+* Recording the arrows in a separate traceback matrix made the traceback function simple: it just follows the arrows back to the start.
 
 # Struggles
+* At first, it was hard to turn the pseudocode into code. The variable names and indexes made it difficult to see what each line was doing until we worked an example by hand.
+* Indexing was confusing at first: Python counts from 0, and the matrix has an extra border row and column, so matrix row i matches seq1[i-1].
+* It took practice to remember that the match score only applies to the diagonal move, while up and left always use the gap penalty.
+
 
 # Reflection and Adaptive Learning
 
 # Personal Reflections
-## Group leader
+## Group leader : Dianah Kasemire
 This was an interesting activity. At first, the pseudocode was hard to follow, and I struggled to turn it into code. What helped most was filling in the scoring matrix by hand for two short sequences, one cell at a time. Once I had done that manually, the pseudocode made sense, and each line of code matched a step I had already done myself. Tracing back through the table by hand also made the traceback function much easier to write. Meeting up with my team to discuss and work through the pseudocode together also helped a lot. Talking through each step made the algorithm clearer, and I’d use both approaches again for future problems.
 
 
@@ -150,3 +159,5 @@ Even though the group's schedule had very little overlap for much collaborative 
 Anthropic Claude Opus 5.5 was used for this project.
 
 Ildiko is inexperienced with NumPy and used Claude to write the NumPy-specific code, since she did not yet know those functions: creating the scoring and traceback matrices (`np.zeros()`, including `dtype=int` for the traceback matrix), finding the best score and its position (`np.max()`, `np.argmax()`, and `np.unravel_index()`), and building the small test matrix for the `traceback()` sanity check (`np.array()`). Claude also explained how each of these functions works before it was added to the code.
+
+Dianah- I used Claude to understand the algorithm. It explained how Smith-Waterman works and walked me through filling in the scoring matrix and doing the traceback by hand on a small example. I filled in the cells myself, and Claude checked my answers and explained my mistakes. I then started writing the pseudocode and used it to check my steps. I wrote most of the lines myself, and for a few parts I was stuck on, Claude showed me the line and explained what it did. I also used it to understand the git errors when pushing and merging our team’s work.
